@@ -106,11 +106,13 @@ export const ExpressApp = async (): Promise<Application> => {
      app.use(createRateLimiter(env.NODE_ENV === 'production' ? 100 : 1000));
 
 
-    // CORS configuration with environment-specific origins
+        // CORS configuration with environment-specific origins
   const allowedOrigins = env.NODE_ENV === 'production'
     ? [
-        process.env.FRONTEND_URL || 'https://yourdomain.com',
-        process.env.ADMIN_URL || 'https://admin.yourdomain.com'
+        env.CLIENT_URL, // Use CLIENT_URL from environment variables
+        'http://localhost:3000', // Allow local development
+        'http://localhost:3001', // Allow local development alternative port
+        'http://127.0.0.1:3000' // Allow local development with 127.0.0.1
       ]
     : [
         'http://localhost:3000',
@@ -122,6 +124,11 @@ export const ExpressApp = async (): Promise<Application> => {
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, etc)
       if (!origin) return callback(null, true);
+
+      // Allow localhost on any port for development
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        return callback(null, true);
+      }
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
