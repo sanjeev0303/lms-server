@@ -1,25 +1,18 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
-import cors from 'cors';
+import { logger, securityLogger } from '@/config/logger';
+import { NODE_ENV } from '@/env';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import helmet from 'helmet';
+import cors from 'cors';
+import express, { Application, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import morgan from 'morgan';
-import { NODE_ENV, PORT } from '@/env';
-import { logger, performanceLogger, securityLogger } from '@/config/logger';
 
 // Import routes
-import AuthRouter from '@/routes/auth-router';
-import CourseRouter from '@/routes/course-router';
-import LectureRouter from '@/routes/lecture-router';
-import OrderRouter from '@/routes/order-router';
-import LectureProgressRouter from '@/routes/lecture-progress-router';
 
 // Import middleware
-import { requestIdMiddleware, requestLogger } from '@/middleware/request-id';
 import { globalErrorHandler } from '@/middleware/error-handler';
-import { performanceMiddleware } from './middleware/performance';
-import { securityMiddleware } from './middleware/security';
+import { requestIdMiddleware, requestLogger } from '@/middleware/request-id';
 
 /**
  * Production-optimized Express application factory

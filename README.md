@@ -1,523 +1,363 @@
-# 🚀 AWS LMS Server - Production-Ready Express.js API
+# LMS Server
 
-[![Build Status](https://github.com/your-username/aws-lms-deploy/workflows/CI/badge.svg)](https://github.com/your-username/aws-lms-deploy/actions)
-[![Coverage Status](https://codecov.io/gh/your-username/aws-lms-deploy/branch/main/graph/badge.svg)](https://codecov.io/gh/your-username/aws-lms-deploy)
-[![Docker Pulls](https://img.shields.io/docker/pulls/your-username/aws-lms-server)](https://hub.docker.com/r/your-username/aws-lms-server)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+A comprehensive Learning Management System (LMS) server built with Node.js, TypeScript, Express, Prisma, and Neon Database.
 
-A production-ready, scalable Express.js server for the AWS Learning Management System (LMS) platform. Built with TypeScript, featuring comprehensive security, monitoring, and deployment automation.
+## 🚀 Features
 
-## ✨ Features
+- **User Management**: Complete authentication system with Clerk
+- **Course Management**: Create, update, and manage courses and lectures
+- **Payment Integration**: Razorpay payment gateway integration
+- **File Uploads**: Cloudinary integration for media files
+- **Progress Tracking**: Track student progress through courses
+- **Order Management**: Complete order and enrollment system
+- **RESTful API**: Comprehensive API endpoints
+- **Docker Support**: Containerized deployment with Neon database
 
-### 🏗️ Architecture & Performance
-- **Modern TypeScript**: Fully typed with strict mode enabled
-- **Express.js 5**: Latest features with enhanced performance
-- **Prisma ORM**: Type-safe database operations with PostgreSQL
-- **Redis Caching**: High-performance caching layer
-- **Compression**: Gzip compression for optimal bandwidth usage
-- **Request Optimization**: Connection pooling and keep-alive
+## 🛠️ Tech Stack
 
-### 🛡️ Security
-- **Helmet.js**: Comprehensive security headers
-- **Rate Limiting**: IP-based with customizable thresholds
-- **CORS**: Environment-specific origin validation
-- **JWT Authentication**: Secure token-based authentication
-- **Input Validation**: Zod schema validation for all endpoints
-- **Security Monitoring**: Real-time threat detection and logging
+- **Runtime**: Node.js with TypeScript
+- **Framework**: Express.js
+- **Database**: Neon (PostgreSQL) with Prisma ORM
+- **Authentication**: Clerk
+- **Payments**: Razorpay
+- **File Storage**: Cloudinary
+- **Containerization**: Docker & Docker Compose
+- **Proxy**: Nginx
 
-### 📊 Monitoring & Logging
-- **Winston Logging**: Structured logging with rotation
-- **Performance Monitoring**: Request timing and memory usage tracking
-- **Health Checks**: Comprehensive endpoint for load balancer integration
-- **Error Tracking**: Centralized error handling and reporting
-- **Audit Logging**: Business event tracking for compliance
+## 📋 Prerequisites
 
-### 🚀 DevOps & Deployment
-- **Docker**: Multi-stage builds with security best practices
-- **Docker Compose**: Complete local development environment
-- **GitHub Actions**: Automated CI/CD pipeline
-- **AWS Deployment**: EC2 with Auto Scaling and Load Balancing
-- **Nginx**: Reverse proxy with SSL termination and caching
-
-### 🔧 Developer Experience
-- **Hot Reload**: Nodemon for development
-- **Code Quality**: ESLint + Prettier + TypeScript strict mode
-- **Testing**: Jest with coverage reporting
-- **API Documentation**: Auto-generated OpenAPI specs
-- **Environment Validation**: Joi-based configuration validation
-
-## 📁 Project Structure
-
-```
-server/
-├── src/
-│   ├── config/          # Configuration files (database, logging, etc.)
-│   ├── controllers/     # Request handlers
-│   ├── middleware/      # Custom middleware (auth, validation, etc.)
-│   ├── routes/          # API route definitions
-│   ├── services/        # Business logic layer
-│   ├── repositories/    # Data access layer
-│   ├── types/           # TypeScript type definitions
-│   ├── interfaces/      # Interface definitions
-│   ├── dto/             # Data transfer objects
-│   ├── utils/           # Utility functions
-│   ├── env/             # Environment configuration
-│   ├── express-app.ts   # Express application setup
-│   └── index.ts         # Application entry point
-├── prisma/              # Database schema and migrations
-├── nginx/               # Nginx configuration
-├── logs/                # Application logs
-├── public/              # Static assets
-├── __tests__/           # Test files
-├── .github/             # GitHub Actions workflows
-├── docker-compose.yml   # Local development environment
-├── Dockerfile           # Production container definition
-└── README.md
-```
+- Node.js 18+ or Docker
+- Neon Database account
+- Clerk account for authentication
+- Razorpay account for payments
+- Cloudinary account for file uploads
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Node.js 18+
-- PostgreSQL 15+
-- Redis 7+
-- Docker & Docker Compose (optional)
+### Environment Setup
 
-### 1. Clone Repository
+1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/aws-lms-deploy.git
-cd aws-lms-deploy/server
+git clone <repository-url>
+cd server
 ```
 
-### 2. Install Dependencies
+2. Copy and configure environment variables:
+```bash
+cp .env.example .env
+```
+
+3. Update `.env` with your credentials:
+```env
+# Server Configuration
+PORT=5000
+NODE_ENV=development
+
+# Neon Database
+DATABASE_URL='your-neon-database-url'
+
+# Clerk Authentication
+CLERK_PUBLISHABLE_KEY="your-clerk-publishable-key"
+CLERK_SECRET_KEY="your-clerk-secret-key"
+CLERK_WEBHOOK_SECRET="your-clerk-webhook-secret"
+
+# Payment Configuration
+RAZORPAY_KEY_ID=your-razorpay-key-id
+RAZORPAY_KEY_SECRET=your-razorpay-secret
+
+# File Upload Configuration
+CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+```
+
+### Development Setup
+
+1. Install dependencies:
 ```bash
 npm install
 ```
 
-### 3. Environment Setup
+2. Set up the database:
 ```bash
-# Copy environment template
-cp .env.example .env
-
-# Edit environment variables
-nano .env
+npx prisma generate
+npx prisma db push
 ```
 
-### 4. Database Setup
+3. Start development server:
 ```bash
-# Generate Prisma client
-npm run prisma:generate
-
-# Run database migrations
-npm run prisma:migrate
-
-# Seed database (optional)
-npm run prisma:seed
-```
-
-### 5. Start Development Server
-```bash
-# Development mode with hot reload
 npm run dev
-
-# Debug mode
-npm run dev:debug
 ```
 
-The server will start at `http://localhost:5000`
-
-## 🔧 Configuration
-
-### Environment Variables
-
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `NODE_ENV` | Environment mode | `development` | ✅ |
-| `PORT` | Server port | `5000` | ✅ |
-| `DATABASE_URL` | PostgreSQL connection string | - | ✅ |
-| `JWT_SECRET` | JWT signing secret | - | ✅ |
-| `REDIS_URL` | Redis connection string | - | ❌ |
-| `CLERK_SECRET_KEY` | Clerk authentication secret | - | ❌ |
-| `CLOUDINARY_*` | Cloudinary configuration | - | ❌ |
-| `RAZORPAY_*` | Razorpay payment configuration | - | ❌ |
-
-> See [.env.example](.env.example) for complete list
-
-### Configuration Validation
-
-The application uses Joi for robust environment validation:
-
-```typescript
-// All environment variables are validated at startup
-const config = {
-  NODE_ENV: 'production',
-  PORT: 5000,
-  DATABASE_URL: 'postgresql://...',
-  // ... other validated configs
-};
-```
-
-## 📚 API Documentation
-
-### Core Endpoints
-
-#### Authentication
-- `POST /api/v1/auth/login` - User login
-- `POST /api/v1/auth/register` - User registration
-- `POST /api/v1/auth/refresh` - Token refresh
-- `POST /api/v1/auth/logout` - User logout
-
-#### Courses
-- `GET /api/v1/courses` - List all courses
-- `POST /api/v1/courses` - Create new course
-- `GET /api/v1/courses/:id` - Get course details
-- `PUT /api/v1/courses/:id` - Update course
-- `DELETE /api/v1/courses/:id` - Delete course
-
-#### Lectures
-- `GET /api/v1/lectures/:courseId` - Get course lectures
-- `POST /api/v1/lectures` - Create new lecture
-- `PUT /api/v1/lectures/:id` - Update lecture
-- `DELETE /api/v1/lectures/:id` - Delete lecture
-
-#### Health & Monitoring
-- `GET /health` - Health check endpoint
-- `GET /api/docs` - API documentation
-
-### Response Format
-
-All API responses follow a consistent format:
-
-```json
-{
-  "success": true,
-  "data": {
-    // Response data
-  },
-  "message": "Operation successful",
-  "timestamp": "2024-01-01T00:00:00.000Z"
-}
-```
-
-### Error Handling
-
-Errors are returned with appropriate HTTP status codes:
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Invalid input data",
-    "details": {
-      "field": "email",
-      "issue": "Invalid email format"
-    }
-  },
-  "timestamp": "2024-01-01T00:00:00.000Z"
-}
-```
-
-## 🧪 Testing
-
-### Run Tests
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run specific test file
-npm test -- auth.test.ts
-```
-
-### Test Structure
-```bash
-__tests__/
-├── unit/           # Unit tests
-├── integration/    # Integration tests
-├── e2e/           # End-to-end tests
-├── fixtures/      # Test data
-├── helpers/       # Test utilities
-└── setup.ts       # Test configuration
-```
-
-### Writing Tests
-```typescript
-import { request } from 'supertest';
-import { app } from '../src/app';
-
-describe('Authentication', () => {
-  it('should login with valid credentials', async () => {
-    const response = await request(app)
-      .post('/api/v1/auth/login')
-      .send({
-        email: 'test@example.com',
-        password: 'password123'
-      });
-
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(response.body.data.token).toBeDefined();
-  });
-});
-```
-
-## 🚀 Deployment
+The server will be available at `http://localhost:5000`
 
 ### Docker Deployment
 
-#### Development
+1. Make sure Docker and Docker Compose are installed
+
+2. Build and run with Docker Compose:
 ```bash
-# Start all services
 docker-compose up -d
-
-# View logs
-docker-compose logs -f app
-
-# Stop services
-docker-compose down
 ```
 
-#### Production
+3. Check logs:
 ```bash
-# Build production image
-docker build -t aws-lms-server .
-
-# Run production container
-docker run -d \
-  --name aws-lms-server \
-  -p 5000:5000 \
-  --env-file .env.production \
-  aws-lms-server
+docker-compose logs -f
 ```
 
-### AWS EC2 Deployment
+The application will be available at:
+- Direct API: `http://localhost:5000`
+- Nginx Proxy: `http://localhost`
 
-Follow the comprehensive [Deployment Guide](DEPLOYMENT_GUIDE.md) for:
-- Infrastructure setup with Terraform
-- Auto Scaling Groups configuration
-- Load Balancer setup with SSL
-- CI/CD pipeline configuration
-- Monitoring and alerting setup
+## 📁 Project Structure
 
-### Key Deployment Features
+```
+src/
+├── config/          # Configuration files
+├── controllers/     # Route controllers
+├── dto/            # Data Transfer Objects
+├── env/            # Environment validation
+├── interfaces/     # TypeScript interfaces
+├── middleware/     # Express middleware
+├── repositories/   # Data access layer
+├── routes/         # API routes
+├── services/       # Business logic
+├── types/          # Type definitions
+└── utils/          # Utility functions
 
-#### Zero-Downtime Deployments
+prisma/
+├── schema.prisma   # Database schema
+└── migrations/     # Database migrations
+
+public/
+└── uploads/        # File uploads directory
+```
+
+## 🔗 API Endpoints
+
+### Authentication
+- `POST /api/auth/webhook` - Clerk webhook handler
+
+### Users
+- `GET /api/users` - Get all users
+- `GET /api/users/:id` - Get user by ID
+- `PUT /api/users/:id` - Update user
+
+### Courses
+- `GET /api/courses` - Get all courses
+- `POST /api/courses` - Create course
+- `GET /api/courses/:id` - Get course by ID
+- `PUT /api/courses/:id` - Update course
+- `DELETE /api/courses/:id` - Delete course
+
+### Lectures
+- `GET /api/lectures` - Get lectures
+- `POST /api/lectures` - Create lecture
+- `PUT /api/lectures/:id` - Update lecture
+- `DELETE /api/lectures/:id` - Delete lecture
+
+### Orders
+- `POST /api/orders` - Create order
+- `GET /api/orders/:id` - Get order
+- `POST /api/orders/verify` - Verify payment
+
+### Progress
+- `POST /api/progress` - Update progress
+- `GET /api/progress/:userId/:courseId` - Get progress
+
+## 🗄️ Database
+
+This project uses Neon (PostgreSQL) as the primary database with Prisma as the ORM.
+
+### Schema Management
+
 ```bash
-# Rolling deployment script
-./scripts/deploy.sh production
-```
+# Generate Prisma client
+npx prisma generate
 
-#### Health Checks
-```bash
-# Load balancer health check
-curl -f https://your-domain.com/health
+# Push schema changes to database
+npx prisma db push
 
-# Response:
-{
-  "success": true,
-  "message": "Server is running successfully!",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "environment": "production",
-  "version": "1.0.0",
-  "uptime": 3600
-}
-```
-
-#### Auto Scaling
-- CPU-based scaling (target: 70%)
-- Memory-based scaling (target: 80%)
-- Custom metrics scaling (response time, error rate)
-
-## 📊 Monitoring
-
-### Logging
-
-The application uses structured logging with different log levels:
-
-```typescript
-import { logger, auditLogger, securityLogger } from '@/config/logger';
-
-// Application logs
-logger.info('User logged in', { userId: '123', ip: '192.168.1.1' });
-logger.error('Database connection failed', { error: err.message });
-
-// Security events
-securityLogger.warn('Suspicious activity detected', {
-  ip: '192.168.1.1',
-  attempts: 5
-});
-
-// Business events
-auditLogger.info('Course created', {
-  courseId: '456',
-  userId: '123',
-  action: 'CREATE_COURSE'
-});
-```
-
-### Performance Monitoring
-
-Built-in performance monitoring tracks:
-- Request duration
-- Memory usage
-- Database query performance
-- Cache hit rates
-- Error rates
-
-### Health Monitoring
-
-The `/health` endpoint provides comprehensive system status:
-
-```json
-{
-  "success": true,
-  "status": "healthy",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "services": {
-    "database": "connected",
-    "redis": "connected",
-    "external_apis": "operational"
-  },
-  "metrics": {
-    "uptime": 3600,
-    "memory_usage": "45%",
-    "cpu_usage": "12%",
-    "response_time": "120ms"
-  }
-}
-```
-
-## 🔧 Development
-
-### Code Quality
-
-#### Linting & Formatting
-```bash
-# Run ESLint
-npm run lint
-
-# Fix ESLint issues
-npm run lint:fix
-
-# Format code with Prettier
-npm run format
-
-# Check TypeScript types
-npm run typecheck
-```
-
-#### Pre-commit Hooks
-```bash
-# Install husky for git hooks
-npm run prepare
-
-# Hooks run automatically on commit:
-# - ESLint check
-# - Prettier formatting
-# - TypeScript compilation
-# - Unit tests
-```
-
-### Database Operations
-
-#### Migrations
-```bash
-# Create new migration
-npx prisma migrate dev --name add-user-table
-
-# Apply migrations (production)
-npm run prisma:deploy
+# Create migration
+npx prisma migrate dev --name your-migration-name
 
 # Reset database (development only)
 npx prisma migrate reset
 ```
 
-#### Prisma Studio
+### Database Schema
+
+The database includes the following main entities:
+- **User**: User management with Clerk integration
+- **Course**: Course information and metadata
+- **Lecture**: Individual course lectures
+- **Order**: Payment and enrollment orders
+- **Review**: Course reviews and ratings
+- **Progress**: Student progress tracking
+
+## 🔧 Configuration
+
+### Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `PORT` | Server port | No (default: 5000) |
+| `NODE_ENV` | Environment mode | No (default: development) |
+| `DATABASE_URL` | Neon database connection string | Yes |
+| `CLERK_PUBLISHABLE_KEY` | Clerk publishable key | Yes |
+| `CLERK_SECRET_KEY` | Clerk secret key | Yes |
+| `CLERK_WEBHOOK_SECRET` | Clerk webhook secret | Yes |
+| `JWT_SECRET` | JWT secret for legacy auth | Yes |
+| `CLIENT_URL` | Frontend application URL | Yes |
+| `RAZORPAY_KEY_ID` | Razorpay key ID | Yes |
+| `RAZORPAY_KEY_SECRET` | Razorpay secret key | Yes |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | Yes |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | Yes |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Yes |
+
+## 🐳 Docker Commands
+
 ```bash
-# Open database browser
-npm run prisma:studio
+# Build and start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+
+# Rebuild and start
+docker-compose up -d --build
+
+# Execute commands in running container
+docker exec -it lms-server bash
 ```
 
-### API Development
+## 🔍 Health Checks
 
-#### Adding New Routes
-1. Create controller in `src/controllers/`
-2. Add service in `src/services/`
-3. Define routes in `src/routes/`
-4. Add validation schemas in `src/dto/`
-5. Write tests in `__tests__/`
+The application includes health check endpoints:
 
-#### Example: Adding a new endpoint
-```typescript
-// src/controllers/user-controller.ts
-export class UserController {
-  async getProfile(req: Request, res: Response) {
-    const userId = req.user.id;
-    const user = await this.userService.getProfile(userId);
+- `GET /health` - Basic health check
+- `GET /api/health` - API health check
 
-    return ResponseHandler.success(res, user, 'Profile retrieved successfully');
-  }
-}
+## 📝 Logging
 
-// src/routes/user-router.ts
-router.get('/profile', authenticateToken, userController.getProfile);
+Logs are organized by type:
+- `logs/combined.log` - All logs
+- `logs/error.log` - Error logs only
+- `logs/audit.log` - Audit logs
+- `logs/performance.log` - Performance logs
+- `logs/security.log` - Security logs
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
 ```
+
+## 🚀 Deployment
+
+### Local Development
+
+1. Make sure Docker and Docker Compose are installed
+
+2. Build and run with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+3. Check logs:
+```bash
+docker-compose logs -f
+```
+
+The application will be available at:
+- Direct API: `http://localhost:5000`
+- Nginx Proxy: `http://localhost`
+
+### Production Deployment on Render
+
+#### Quick Start
+
+1. **Run the setup script** to get environment variables:
+```bash
+./render-setup.sh
+```
+
+2. **Test your deployment locally**:
+```bash
+./deploy-test.sh
+```
+
+3. **Deploy to Render**:
+   - Push code to GitHub
+   - Create Web Service on Render
+   - Configure environment variables from setup script
+   - Deploy!
+
+#### Detailed Guide
+
+For complete step-by-step instructions, see: **[RENDER_DEPLOYMENT_GUIDE.md](../RENDER_DEPLOYMENT_GUIDE.md)**
+
+#### Render Configuration
+
+- **Build Command**: `npm run render:build`
+- **Start Command**: `npm run render:start`
+- **Health Check Path**: `/health`
+- **Environment**: Node.js 18+
+- **Root Directory**: `server`
+
+#### Environment Variables for Render
+
+```env
+NODE_ENV=production
+DATABASE_URL=your_neon_database_url
+CLERK_PUBLISHABLE_KEY=pk_live_...
+CLERK_SECRET_KEY=sk_live_...
+CLERK_WEBHOOK_SECRET=whsec_...
+JWT_SECRET=generated_secure_secret
+CLIENT_URL=https://your-client-app.onrender.com
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+RAZORPAY_KEY_ID=rzp_live_...
+RAZORPAY_KEY_SECRET=your_secret
+```
+
+### Other Deployment Options
+
+The application is containerized and can be deployed on:
+- **Render** (Recommended - managed Node.js hosting)
+- **Railway** (Alternative managed hosting)
+- **DigitalOcean App Platform**
+- **AWS ECS/Fargate** (with Docker)
+- **Google Cloud Run** (with Docker)
+- **Azure Container Instances** (with Docker)
+
+## 🔒 Security
+
+- CORS configured for client application
+- Rate limiting implemented
+- Input validation with DTOs
+- Secure headers with Helmet
+- Environment variables for sensitive data
 
 ## 🤝 Contributing
 
-1. **Fork the repository**
-2. **Create feature branch**: `git checkout -b feature/amazing-feature`
-3. **Commit changes**: `git commit -m 'Add amazing feature'`
-4. **Push to branch**: `git push origin feature/amazing-feature`
-5. **Open Pull Request**
-
-### Development Guidelines
-
-- Follow TypeScript best practices
-- Write comprehensive tests for new features
-- Update documentation for API changes
-- Use conventional commit messages
-- Ensure all CI checks pass
-
-### Code Review Process
-
-- All PRs require at least 2 approvals
-- Automated tests must pass
-- Security scan must pass
-- Performance impact assessment
-- Documentation updates required
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Express.js** - Fast, unopinionated web framework
-- **Prisma** - Next-generation ORM for Node.js
-- **Winston** - Universal logging library
-- **Jest** - JavaScript testing framework
-- **TypeScript** - Typed superset of JavaScript
-
-## 📞 Support
-
-- **Documentation**: [API Docs](https://your-domain.com/api/docs)
-- **Issues**: [GitHub Issues](https://github.com/your-username/aws-lms-deploy/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/aws-lms-deploy/discussions)
-- **Email**: support@your-domain.com
-
----
-
-<div align="center">
-
-**Built with ❤️ for scalable learning platforms**
-
-[⭐ Star this repo](https://github.com/your-username/aws-lms-deploy) • [🐛 Report Bug](https://github.com/your-username/aws-lms-deploy/issues) • [✨ Request Feature](https://github.com/your-username/aws-lms-deploy/issues)
-
-</div>
+This project is licensed under the MIT License.

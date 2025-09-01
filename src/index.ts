@@ -1,23 +1,56 @@
+import 'module-alias/register';
 import { ExpressApp } from './express-app';
 // import { createExpressApp } from './express-app-enhanced';
 import * as env from './env/index';
 import type { Server } from 'http';
 
-console.log('🔄 Starting TypeScript Server...');
+console.log('🔄 Starting LMS Server...');
+console.log(`📍 Environment: ${env.NODE_ENV}`);
+console.log(`📍 Render deployment: ${env.IS_RENDER ? 'Yes' : 'No'}`);
 
 let server: Server;
 
 async function startServer() {
     try {
+        console.log('🔄 Initializing Express app...');
         const app = await ExpressApp();
-        const port = typeof env.PORT === 'string' ? parseInt(env.PORT, 10) : env.PORT;
 
-        server = app.listen(port, () => {
+        const port = typeof env.PORT === 'string' ? parseInt(env.PORT, 10) : env.PORT;
+        const host = env.IS_RENDER ? '0.0.0.0' : 'localhost';
+
+        server = app.listen(port, host, () => {
             console.log('✅ Server setup complete!');
-            console.log(`🚀 Server running on port ${port}`);
-            console.log(`📍 Main route: http://localhost:${port}/`);
-            console.log(`📍 Health check: http://localhost:${port}/health`);
+            console.log(`🚀 Server running on ${host}:${port}`);
+            console.log(`📍 Environment: ${env.NODE_ENV}`);
+            console.log(`📍 Health check: http://${host}:${port}/health`);
+
+            if (env.IS_RENDER && env.RENDER_SERVICE_URL) {
+                console.log(`🌐 Render URL: ${env.RENDER_SERVICE_URL}`);
+            }
         });
+
+        // Handle server errors
+        server.on('error', (error: any) => {
+            if (error.syscall !== 'listen') {
+                throw error;
+            }
+
+            const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+            switch (error.code) {
+                case 'EACCES':
+                    console.error(`❌ ${bind} requires elevated privileges`);
+                    process.exit(1);
+                    break;
+                case 'EADDRINUSE':
+                    console.error(`❌ ${bind} is already in use`);
+                    process.exit(1);
+                    break;
+                default:
+                    throw error;
+            }
+        });
+
     } catch (error) {
         console.error('❌ Failed to start server:', error);
         process.exit(1);

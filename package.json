@@ -1,7 +1,7 @@
 {
-  "name": "aws-lms-server",
+  "name": "lms-server",
   "version": "1.0.0",
-  "description": "Production-ready Express.js server for AWS LMS Platform",
+  "description": "Production-ready Express.js server for LMS Platform",
   "main": "dist/index.js",
   "engines": {
     "node": ">=18.0.0",
@@ -26,21 +26,22 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "docker:build": "docker build -t aws-lms-server .",
-    "docker:run": "docker run -p 5000:5000 aws-lms-server",
-    "health": "curl -f http://localhost:5000/health || exit 1"
+    "docker:build": "docker build -t lms-server .",
+    "docker:run": "docker run -p 5000:5000 lms-server",
+    "health": "curl -f http://localhost:5000/health || exit 1",
+    "render:build": "npm run prisma:generate && npm run build",
+    "render:start": "npm run prisma:deploy && npm run start:prod"
   },
   "keywords": [
     "express",
     "typescript",
     "api",
     "lms",
-    "aws",
     "production",
     "docker",
     "prisma"
   ],
-  "author": "AWS LMS Team",
+  "author": "LMS Team",
   "license": "MIT",
   "dependencies": {
     "@clerk/backend": "^2.9.4",
@@ -56,6 +57,7 @@
     "helmet": "^8.1.0",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "prisma": "^6.14.0",
@@ -67,14 +69,15 @@
     "zod": "^4.0.17"
   },
   "devDependencies": {
-    "@types/compression": "^1.7.5",
+    "@types/bcrypt": "^6.0.0",
+    "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.9",
-    "@types/cors": "^2.8.17",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/helmet": "^0.0.48",
     "@types/jest": "^29.5.8",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/morgan": "^1.9.9",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^22.0.0",
     "@types/supertest": "^2.0.16",
@@ -92,5 +95,19 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.6.3"
+  },
+  "_moduleAliases": {
+    "@": "dist",
+    "@/config": "dist/config",
+    "@/controllers": "dist/controllers",
+    "@/middleware": "dist/middleware",
+    "@/services": "dist/services",
+    "@/repositories": "dist/repositories",
+    "@/routes": "dist/routes",
+    "@/utils": "dist/utils",
+    "@/types": "dist/types",
+    "@/interfaces": "dist/interfaces",
+    "@/dto": "dist/dto",
+    "@/env": "dist/env"
   }
 }
