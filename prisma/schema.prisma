@@ -1,0 +1,169 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum Role {
+    ADMIN
+    INSTRUCTOR
+    STUDENT
+}
+
+enum Level {
+    BEGINNER
+    INTERMEDIATE
+    ADVANCE
+}
+
+enum OrderStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    CANCELLED
+    REFUNDED
+}
+
+model User {
+    id          String   @id @default(cuid())
+    clerkId     String   @unique
+    email       String?  @unique
+    firstName   String?
+    lastName    String?
+    imageUrl    String?
+    password    String?
+    phoneNumber String?
+    role        Role     @default(STUDENT)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    createdCourses  Course[]               @relation("CourseCreator")
+    enrollments     UserCourseEnrollment[]
+    orders          Order[]                @relation("StudentOrders")
+    reviews         Review[]               @relation("UserReviews")
+    lectureProgress UserLectureProgress[]  @relation("UserLectureProgress")
+
+    @@map("user")
+}
+
+model Course {
+    id          String   @id @default(cuid())
+    title       String
+    subTitle    String?
+    description String?
+    category    String
+    level       Level?
+    price       Float?
+    thumbnail   String?
+    isPublished Boolean  @default(false)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    creator         User                   @relation("CourseCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+    creatorId       String
+    enrollments     UserCourseEnrollment[]
+    lectures        Lecture[]              @relation("CourseLectures")
+    orders          Order[]                @relation("CourseOrders")
+    reviews         Review[]               @relation("CourseReviews")
+    lectureProgress UserLectureProgress[]  @relation("CourseLectureProgress")
+}
+
+model UserCourseEnrollment {
+    id         String   @id @default(cuid())
+    userId     String
+    courseId   String
+    orderId    String? // Reference to the order that created this enrollment
+    enrolledAt DateTime @default(now())
+
+    // Relations
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    order  Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+    @@unique([userId, courseId])
+    @@map("user_course_enrollments")
+}
+
+model UserLectureProgress {
+    id          String    @id @default(cuid())
+    userId      String
+    lectureId   String
+    courseId    String
+    isCompleted Boolean   @default(false)
+    isUnlocked  Boolean   @default(false)
+    watchedAt   DateTime?
+    completedAt DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    // Relations
+    user    User    @relation("UserLectureProgress", fields: [userId], references: [id], onDelete: Cascade)
+    lecture Lecture @relation("LectureProgress", fields: [lectureId], references: [id], onDelete: Cascade)
+    course  Course  @relation("CourseLectureProgress", fields: [courseId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, lectureId])
+    @@map("user_lecture_progress")
+}
+
+model Lecture {
+    id          String   @id @default(cuid())
+    title       String
+    description String?
+    videoUrl    String?
+    isFree      Boolean? @default(false)
+    position    Int?     @default(0)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    course   Course                @relation("CourseLectures", fields: [courseId], references: [id], onDelete: Cascade)
+    courseId String
+    progress UserLectureProgress[] @relation("LectureProgress")
+
+    @@map("lectures")
+}
+
+model Order {
+    id                String      @id @default(cuid())
+    razorpayOrderId   String?     @unique
+    razorpayPaymentId String?
+    razorpaySignature String?
+    amount            Float
+    currency          String      @default("INR")
+    status            OrderStatus @default(PENDING)
+    isPaid            Boolean     @default(false)
+    paidAt            DateTime?
+    createdAt         DateTime    @default(now())
+    updatedAt         DateTime    @updatedAt
+
+    // Relations
+    course      Course                 @relation("CourseOrders", fields: [courseId], references: [id], onDelete: Cascade)
+    courseId    String
+    student     User                   @relation("StudentOrders", fields: [studentId], references: [id], onDelete: Cascade)
+    studentId   String
+    enrollments UserCourseEnrollment[] // Orders can have associated enrollments
+
+    @@map("orders")
+}
+
+model Review {
+    id         String   @id @default(cuid())
+    rating     Int
+    comment    String?
+    reviewedAt DateTime @default(now())
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    // Relations
+    user     User   @relation("UserReviews", fields: [userId], references: [id], onDelete: Cascade)
+    userId   String
+    course   Course @relation("CourseReviews", fields: [courseId], references: [id], onDelete: Cascade)
+    courseId String
+
+    @@map("reviews")
+}
