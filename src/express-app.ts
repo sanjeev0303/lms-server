@@ -204,7 +204,7 @@ export const ExpressApp = async (): Promise<Application> => {
     app.use('/course', CourseRouter)
     app.use("/lecture", LectureRouter)
     app.use("/order", OrderRouter)
-    app.use("/lecture-progress", LectureProgressRouter)
+    app.use("/api/lecture-progress", LectureProgressRouter)
 
 
     // Health check endpoint (before authentication)
@@ -227,23 +227,6 @@ export const ExpressApp = async (): Promise<Application> => {
             version: '1.0.0'
         });
     });
-
-     // API documentation endpoint
-      app.get('/api/docs', (req: Request, res: Response) => {
-        res.json({
-          message: 'AWS LMS API Documentation',
-          version: '1.0.0',
-          endpoints: {
-            auth: '/api/v1/auth',
-            courses: '/api/v1/courses',
-            lectures: '/api/v1/lectures',
-            orders: '/api/v1/orders',
-            progress: '/api/v1/lecture-progress'
-          },
-          health: '/health',
-          environment: env.NODE_ENV
-        });
-      });
 
     // 404 handler
     app.use((req: Request, res: Response) => {

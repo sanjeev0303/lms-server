@@ -189,16 +189,41 @@ export class CourseController {
                 // Validate only the present fields
                 const validatedData = UpdateCourseDtoSchema.partial().parse(fieldsToValidate);
 
-                // Convert string values to appropriate types
-                const processedUpdateData: UpdateCourseDto = {
+                // Convert string values to appropriate types and trim strings
+                const processedUpdateData: any = {
                     ...validatedData,
-                    ...(validatedData.price && { price: parseFloat(validatedData.price as any) }),
-                    ...(validatedData.isPublished !== undefined && {
-                        isPublished: typeof validatedData.isPublished === 'string'
-                            ? validatedData.isPublished === 'true'
-                            : validatedData.isPublished
-                    })
                 };
+
+                if (processedUpdateData.title !== undefined) {
+                    processedUpdateData.title = String(processedUpdateData.title).trim();
+                }
+                if (processedUpdateData.subTitle !== undefined) {
+                    processedUpdateData.subTitle = String(processedUpdateData.subTitle).trim();
+                }
+                if (processedUpdateData.description !== undefined) {
+                    processedUpdateData.description = String(processedUpdateData.description).trim();
+                }
+                if (processedUpdateData.category !== undefined) {
+                    processedUpdateData.category = String(processedUpdateData.category).trim();
+                }
+
+                if (processedUpdateData.price !== undefined) {
+                    const parsed = typeof processedUpdateData.price === 'string'
+                        ? parseFloat(processedUpdateData.price)
+                        : processedUpdateData.price;
+                    if (Number.isNaN(parsed)) {
+                        // Drop invalid price instead of causing DB error
+                        delete processedUpdateData.price;
+                    } else {
+                        processedUpdateData.price = parsed;
+                    }
+                }
+
+                if (processedUpdateData.isPublished !== undefined) {
+                    processedUpdateData.isPublished = typeof processedUpdateData.isPublished === 'string'
+                        ? processedUpdateData.isPublished === 'true'
+                        : !!processedUpdateData.isPublished;
+                }
 
                 const updateCourse = await this.courseService.updateCourse(courseId, processedUpdateData, file)
 
