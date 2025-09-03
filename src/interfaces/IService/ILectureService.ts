@@ -8,4 +8,5 @@ export interface ILectureService {
      getLectureById(lectureId: string): Promise<{ lecture: LectureResponseDto }>
      updateLecture(lectureId: string, updateData: UpdateLectureDto, file?: Express.Multer.File): Promise<LectureResponseDto>
      deleteLecture(lectureId: string): Promise<{ message: string }>
+     reorderLectures(courseId: string, lectureOrders: { id: string; position: number }[]): Promise<{ message: string }>
 }

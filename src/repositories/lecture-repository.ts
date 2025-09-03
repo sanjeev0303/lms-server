@@ -9,11 +9,20 @@ export class LectureRepository implements ILectrueRepository{
 
    async create(lectureData: CreateLectureDto, courseId: string): Promise<ILecture> {
         try {
+            // Get the next position for this course
+            const maxPosition = await this.db.lecture.aggregate({
+                where: { courseId },
+                _max: { position: true }
+            });
+
+            const nextPosition = (maxPosition._max.position || 0) + 1;
+
             const lecture = await this.db.lecture.create({
                 data: {
                     title: lectureData.title,
                     description: lectureData.description,
                     isFree: lectureData.isFree || false,
+                    position: nextPosition,
                     courseId
                 }
             })
@@ -130,6 +139,35 @@ export class LectureRepository implements ILectrueRepository{
         } catch (error) {
             console.error('Error deleting lecture:', error);
             return false;
+        }
+    }
+
+    /**
+     * Bulk update lecture positions for reordering
+     */
+    async reorderLectures(courseId: string, lectureOrders: { id: string; position: number }[]): Promise<boolean> {
+        try {
+            console.log('🔄 Repository reorderLectures called with:', { courseId, lectureOrders });
+
+            // Use transaction to ensure all updates succeed or fail together
+            await this.db.$transaction(async (tx) => {
+                for (const { id, position } of lectureOrders) {
+                    console.log(`📝 Updating lecture ${id} to position ${position}`);
+                    await tx.lecture.update({
+                        where: {
+                            id,
+                            courseId // Ensure lecture belongs to the specified course
+                        },
+                        data: { position }
+                    });
+                }
+            });
+
+            console.log('✅ Transaction completed successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error in repository reorderLectures:', error);
+            throw new Error('Failed to reorder lectures');
         }
     }
 

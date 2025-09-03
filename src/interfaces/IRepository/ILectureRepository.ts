@@ -7,4 +7,5 @@ export interface ILectrueRepository {
     findByCourse(courseId: string): Promise<ILecture[]>
     update(id: string, updateData: UpdateLectureDto & { videoUrl?: string }): Promise<ILecture | null>
     delete(id: string): Promise<boolean>
+    reorderLectures(courseId: string, lectureOrders: { id: string; position: number }[]): Promise<boolean>
 }

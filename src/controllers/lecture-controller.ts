@@ -138,4 +138,40 @@ export class LectureController {
         }
     }
 
+    /**
+     * Reorder lectures for a course
+     */
+    async reorderLectures(req: AuthenticatedRequest, res: Response) {
+        try {
+            const { courseId } = req.params
+            const { lectureOrders } = req.body
+
+            if (!courseId) {
+                return ResponseHandler.error(res, 'Course ID is required', 400)
+            }
+
+            if (!lectureOrders || !Array.isArray(lectureOrders)) {
+                return ResponseHandler.error(res, 'Valid lecture orders array is required', 400)
+            }
+
+            // Validate lecture orders format
+            for (const order of lectureOrders) {
+                if (!order.id || typeof order.position !== 'number') {
+                    return ResponseHandler.error(res, 'Each lecture order must have id and position', 400)
+                }
+            }
+
+            const result = await this.lectureService.reorderLectures(courseId, lectureOrders)
+
+            return ResponseHandler.success(
+                res,
+                result,
+                'Lectures reordered successfully'
+            )
+        } catch (error) {
+            console.error('Error reordering lectures:', error)
+            return ResponseHandler.error(res, 'Failed to reorder lectures', 500)
+        }
+    }
+
 }

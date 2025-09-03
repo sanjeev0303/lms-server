@@ -127,4 +127,16 @@ export class LectureService implements ILectureService{
         }
     }
 
+    async reorderLectures(courseId: string, lectureOrders: { id: string; position: number }[]): Promise<{ message: string }> {
+        try {
+            console.log('🔄 Service reorderLectures called with:', { courseId, lectureOrders });
+            await this.lectureRepository.reorderLectures(courseId, lectureOrders);
+            console.log('✅ Repository reorderLectures completed successfully');
+            return { message: 'Lectures reordered successfully' };
+        } catch (error) {
+            console.error('❌ Error in service reorderLectures:', error);
+            throw error;
+        }
+    }
+
 }

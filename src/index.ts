@@ -1,4 +1,9 @@
-import 'module-alias/register';
+// Register module-alias only in production so path aliases resolve to dist at runtime
+// In development, ts-node with tsconfig-paths handles aliases to src
+if (process.env.NODE_ENV === 'production') {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  require('module-alias/register');
+}
 import { ExpressApp } from './express-app';
 // import { createExpressApp } from './express-app-enhanced';
 import * as env from './env/index';
@@ -78,17 +83,16 @@ const gracefulShutdown = (signal: string) => {
 
         // Force close after 10 seconds
         setTimeout(() => {
-            console.log('⏰ Forcing shutdown after 10 seconds...');
-            process.exit(1);
-        }, 10000);
-    } else {
-        process.exit(0);
+            console.warn('⏱️ Force closing server after timeout');
+            process.exit(0);
+        }, 10_000).unref();
     }
 };
 
-// Handle different shutdown signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+// Handle termination signals
+['SIGTERM', 'SIGINT'].forEach((signal) => {
+    process.on(signal as NodeJS.Signals, () => gracefulShutdown(signal));
+});
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
